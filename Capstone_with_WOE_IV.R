@@ -18,6 +18,7 @@ library(randomForest)
 library(DMwR)
 library(gridExtra)
 library(Information)
+library(scorecard)
 
 setwd("D:\\F\\IIITB capstone Project\\Source files")
 
@@ -64,7 +65,7 @@ perform_fn <- function(cutoff){
   return(out)
 }
 
-perform_fn1 <- function(cutoff) 
+perform_fn_rf <- function(cutoff) 
 {
   test$Performance.Tag<- factor(ifelse(test$Performance.Tag==1,"Yes","No"))
   test$predicted.response<- factor(ifelse(test$predicted.prob[,1] >= cutoff, "Yes", "No"))
@@ -144,7 +145,6 @@ sapply(CreditBureau, function(x) sum(trimws(x) == "",na.rm = TRUE))
 sum(duplicated(demographics))
 sum(duplicated(CreditBureau))
 ### There are no duplicated records in two dataframe
-
 
 sum(duplicated(demographics$Application.ID))
 
@@ -643,7 +643,7 @@ s = seq(.5,.99,length=100)
 OUT = matrix(0,100,3)
 
 for(i in 1:100){  
-  OUT[i,] = perform_fn1(s[i])
+  OUT[i,] = perform_fn_rf(s[i])
 } 
 
 #Plot to choose best cutoff
@@ -693,3 +693,8 @@ test$score <- 333.5614 + (28.8539 * test$log_odds)
 test$score
 
 View(test [,c(1,39:41)])
+
+# woe binning ------
+bins = woebin(train, "Performance.Tag")
+
+scorecard(bins, model_6, points0 = 400, odds0 = 10, pdo = 20, basepoints_eq0 = FALSE)
